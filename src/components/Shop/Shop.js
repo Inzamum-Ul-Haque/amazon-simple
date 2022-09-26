@@ -15,8 +15,8 @@ const Shop = () => {
   }, []);
 
   useEffect(() => {
+    // get the cart from local storage and update the quantity of the product we find and then update the cart wheneve we reload the page
     const storedCart = getStoredCart();
-    console.log(storedCart);
     const savedCart = [];
     for (const id in storedCart) {
       const addedProduct = products.find((product) => product.id === id);
@@ -29,10 +29,21 @@ const Shop = () => {
     }
   }, [products]);
 
-  const addToCart = (product) => {
-    const newCart = [...cart, product];
+  const addToCart = (selectedProduct) => {
+    // whenever we click on add to cart, we add the products and also updating it to the cart as well as adding it to the local storage
+    console.log(selectedProduct);
+    let newCart = [];
+    const exists = cart.find((product) => product.id === selectedProduct.id);
+    if (!exists) {
+      selectedProduct.quantity = 1;
+      newCart = [...cart, selectedProduct];
+    } else {
+      const rest = cart.filter((product) => product.id !== selectedProduct.id);
+      exists.quantity = exists.quantity + 1;
+      newCart = [...rest, exists];
+    }
     setCart(newCart);
-    addToDb(product.id);
+    addToDb(selectedProduct.id);
   };
 
   return (
