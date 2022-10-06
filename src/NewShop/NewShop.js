@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { addToDb, getStoredCart } from "../../utilities/fakedb";
-import Cart from "../Cart/Cart";
-import Product from "../Product/Product";
-import "./Shop.css";
+import Cart from "../components/Cart/Cart";
+import Product from "../components/Product/Product";
+import { addToDb, getStoredCart } from "../utilities/fakedb";
 
-const Shop = () => {
+const NewShop = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
 
@@ -15,22 +14,20 @@ const Shop = () => {
   }, []);
 
   useEffect(() => {
-    // get the cart from local storage and update the quantity of the product we find and then update the cart whenever we reload the page. এটা না করলে আবার reload দিলে basic quantity টাই দেখাবে। তাই update করার জন্য এই useEffect দিতে হবে।
-    const storedCart = getStoredCart();
-    const savedCart = [];
-    for (const id in storedCart) {
+    const savedCart = getStoredCart();
+    const newCart = [];
+    for (const id in savedCart) {
       const addedProduct = products.find((product) => product.id === id);
       if (addedProduct) {
-        const quantity = storedCart[id];
+        const quantity = addedProduct[id];
         addedProduct.quantity = quantity;
-        savedCart.push(addedProduct);
-        setCart(savedCart);
+        newCart.push(addedProduct);
       }
     }
+    setCart(newCart);
   }, [products]);
 
-  const addToCart = (selectedProduct) => {
-    // whenever we click on add to cart, we add the products and also updating it to the cart as well as adding it to the local storage
+  const addToCartNew = (selectedProduct) => {
     let newCart = [];
     const exists = cart.find((product) => product.id === selectedProduct.id);
     if (!exists) {
@@ -50,7 +47,11 @@ const Shop = () => {
       <div className="products-container">
         {products
           .map((product) => (
-            <Product key={product.id} product={product} addToCart={addToCart} />
+            <Product
+              key={product.id}
+              product={product}
+              addToCart={addToCartNew}
+            />
           ))
           .slice(0, 10)}
       </div>
@@ -61,4 +62,4 @@ const Shop = () => {
   );
 };
 
-export default Shop;
+export default NewShop;
